@@ -1,0 +1,96 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyVPCDefaultSecurityGroupModification",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupEgress"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:ResourceTag/Name": "default"
+        }
+      }
+    },
+    {
+      "Sid": "DenyVPCChanges",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:DeleteVpc",
+        "ec2:DeleteSubnet",
+        "ec2:DeleteInternetGateway",
+        "ec2:DeleteNatGateway",
+        "ec2:DeleteRouteTable",
+        "ec2:DeleteNetworkAcl",
+        "ec2:DeleteNetworkInterface"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/NetworkAdmin",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyNetworkACLDChanges",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:DeleteNetworkAclEntry",
+        "ec2:ReplaceNetworkAclEntry",
+        "ec2:ReplaceNetworkAclAssociation"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/NetworkAdmin",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenySecurityGroupWideOpenIngress",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:ModifySecurityGroupRules"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "IpEquals": {
+          "ec2:CidrIp": "0.0.0.0/0"
+        }
+      }
+    },
+    {
+      "Sid": "DenyRouteTableChanges",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:DeleteRoute",
+        "ec2:ReplaceRoute",
+        "ec2:CreateRoute"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/NetworkAdmin",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    }
+  ]
+}

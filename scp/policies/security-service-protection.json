@@ -1,0 +1,101 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyCloudTrailDeletion",
+      "Effect": "Deny",
+      "Action": [
+        "cloudtrail:DeleteTrail",
+        "cloudtrail:PutEventSelectores",
+        "cloudtrail:StopLogging",
+        "cloudtrail:UpdateTrail"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyGuardDutyModification",
+      "Effect": "Deny",
+      "Action": [
+        "guardduty:DeleteDetector",
+        "guardduty:DisassociateFromMasterAccount",
+        "guardduty:UpdateDetectorConfig",
+        "guardduty:UpdateOrganizationConfiguration"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyConfigModification",
+      "Effect": "Deny",
+      "Action": [
+        "config:DeleteConfigRule",
+        "config:DeleteConfigurationAggregator",
+        "config:DeleteConformancePack",
+        "config:PutConfigRule",
+        "config:PutConfigurationAggregator",
+        "config:PutConformancePack",
+        "config:StopConfigurationRecorder"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenySecurityHubModification",
+      "Effect": "Deny",
+      "Action": [
+        "securityhub:DeleteInsight",
+        "securityhub:DeleteStandardsSubscription",
+        "securityhub:DisableSecurityHub",
+        "securityhub:DisassociateFromMasterAccount",
+        "securityhub:UpdateSecurityHubConfiguration"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyAccessAnalyzerDeletion",
+      "Effect": "Deny",
+      "Action": [
+        "access-analyzer:DeleteAnalyzer"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:PrincipalArn": [
+            "arn:aws:iam::*:role/AWSControlTowerExecution",
+            "arn:aws:iam::*:role/SecurityBreakGlass"
+          ]
+        }
+      }
+    }
+  ]
+}

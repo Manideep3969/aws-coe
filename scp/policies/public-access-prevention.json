@@ -1,0 +1,86 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyS3PublicAccess",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutBucketPolicy",
+        "s3:PutBucketAcl",
+        "s3:PutObjectAcl",
+        "s3:DeleteBucketPolicy",
+        "s3:PutBucketPublicAccessBlock"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "s3:x-amz-acl": [
+            "public-read",
+            "public-read-write",
+            "authenticated-read"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyPublicAMIs",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:ModifyImageAttribute"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:AttributeType": "launchPermission"
+        },
+        "ForAnyValue:StringEquals": {
+          "ec2:AttributeUserType": "all"
+        }
+      }
+    },
+    {
+      "Sid": "DenyPublicRDSSnapshots",
+      "Effect": "Deny",
+      "Action": [
+        "rds:ModifyDBSnapshotAttribute",
+        "rds:RestoreDBInstanceFromDBSnapshot"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringEquals": {
+          "rds:AttributeUserType": "all"
+        }
+      }
+    },
+    {
+      "Sid": "DenyPublicEBSSnapshots",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:ModifySnapshotAttribute"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringEquals": {
+          "ec2:AttributeUserType": "all"
+        }
+      }
+    },
+    {
+      "Sid": "DenyS3BucketPublicRead",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::*/*",
+      "Condition": {
+        "StringEquals": {
+          "s3:x-amz-acl": [
+            "public-read",
+            "public-read-write",
+            "authenticated-read"
+          ]
+        }
+      }
+    }
+  ]
+}
