@@ -1,0 +1,192 @@
+Based on the images provided, here is the text content of the Well-Architected Framework review report for xxxx workloads on AWS:
+---
+
+### Executive Summary
+
+This report presents findings from a Well-Architected Framework review focusing on the Security Pillar.
+
+### Assessment Details
+
+* **Date of Review:** April 18th, 2025
+* **Application:** NPCI business applications hosted on AWS
+* **Environment:** Production
+* **Reviewer:** Ashish Srivastava
+* **Stakeholders:** NPCI team, AWS team
+
+---
+
+### SEC 1: Security Foundations (Identity and Access Management)
+
+**Strong Practices:**
+
+* IAM roles properly configured for AWS services using local IAM.
+* Password policies implemented.
+
+**Gaps Identified:**
+
+* IAM identity centre is configured in North Virginia that needs to be disabled and re-configured in Mumbai.
+* MFA and password reset policy need to be enforced; critical users are missing MFA.
+* No regular IAM access enforcement at org level.
+* Missing KEY service control policies.
+
+**Recommendations:**
+
+1. Enforce MFA for all accounts.
+2. Establish quarterly access reviews since there are inactive users with password age more than 90 days sitting in IAM.
+3. It’s recommended to use CIAM using dynamic authentication with Cognito rather than using static APIs.
+4. Implement IAM access analyzer for external access (it’s free).
+5. Stay up to date with latest threat intelligence sources to stay up to date, reduce the risk of missing out on important changes to the threat landscape that can impact your business. Having automation in place to scan, detect, and remediate where potential vulnerabilities or exposures exist in your workloads and their dependencies can help you mitigate risks quickly and predictably, compared to manual alternatives.
+6. AWS provides Amazon GuardDuty which stays up to date with industry threat intelligence for detection of anomalous behaviours and threat signatures within your accounts. Amazon Inspector automatically keeps a database of the CVEs it uses for its continuous scanning features up to date. AWS WAF and AWS Network Firewall provide managed rule groups that are updated automatically as new threats emerge.
+7. NPCI need to evaluate which Service Control Policies (SCPs) would be applicable for them and we can get it created.
+
+**PREVENTIVE CONTROLS:**
+
+1. **Root Account Protection:** Prevent root account usage, block root account API calls, restrict root account modifications, protect root account credentials.
+2. **Region Restrictions:** Limit allowed AWS regions, block non-approved regions, control regional resource deployment, enforce geographic boundaries.
+3. **Security Services Protection:** Prevent deletion of CloudTrail, protect GuardDuty settings, secure Config rules, maintain Security Hub.
+4. **Resource Protection:** Enforce encryption, prevent public access, protect critical resources, control resource sharing.
+5. **Network Controls:** Protect VPC configurations, control internet access, protect network ACLs, secure routing tables.
+
+**COMPLIANCE CONTROLS:**
+
+1. **Resource Tagging:** Enforce mandatory tags, standardize naming conventions, control cost allocation, track resource ownership.
+2. **Service Restrictions:** Block unauthorized services, control service access, limit service features, manage service endpoints.
+3. **Data Protection:** Enforce encryption, control data movement, protect sensitive data, manage backup policies.
+
+---
+
+### SEC 2: Data Protection
+
+**Strong Practices:**
+
+* Encryptions enabled at Database Layer.
+* Encryptions enabled at S3 Layer.
+* SSL certificate configured for ALB.
+
+**Gaps Identified:**
+
+* WAF implementation is not inline for OWASP top 10 attack prevention recommendation.
+* No mechanism to detect threat on data sources.
+* Single key is getting used for all encryption.
+
+**Recommendations:**
+
+1. Configure WAF with core rule set, IP reputation list and Anonymous IP list rules.
+2. Implement data classification tags.
+3. Enable comprehensive logging.
+4. Rather than using AMI from internet it's recommended to generate CIS hardened image using Image Builder.
+5. Implement GuardDuty for threat detection.
+6. Configure S3 access logs.
+7. S3 buckets are configured with SSE-S3 encryption; it's recommended to use SSE-KMS encryption and encrypt using 3rd party KMS key.
+
+---
+
+### SEC 3: Infrastructure Protection
+
+**Strong Practices:**
+
+* VPC architecture implemented.
+* Security groups in use.
+
+**Gaps Identified:**
+
+* Missing VPC flow logs.
+* No network traffic monitoring.
+* Absence of network segmentation.
+
+**Recommendations:**
+
+1. Enable VPC flow logs.
+2. Implement AWS Network Firewall.
+3. Review and enhance network segmentation.
+4. Configure Access and connection logs for ALB.
+5. Configure mTLS for load balancers serving critical applications.
+
+---
+
+### SEC 4: Detective Controls
+
+**Strong Practices:**
+
+* CloudTrail enabled.
+* Basic CloudWatch monitoring.
+
+**Gaps Identified:**
+
+* Security Hub implementation need to be centralised at org level.
+* No vulnerability scanning mechanism in place.
+* Incomplete application logging.
+
+**Recommendations:**
+
+1. Enable Security Hub at org level with central aggregation.
+2. Leverage AWS config inventory and compliance dashboards for unified view of compliance.
+3. Deploy Amazon Inspector or 3rd party vulnerability scanner for vulnerability scanning.
+4. Implement comprehensive application logging.
+
+---
+
+### SEC 5: Incident Response
+
+**Strong Practices:**
+
+* Basic incident response process exists.
+
+**Gaps Identified:**
+
+* No documented playbooks.
+* Missing automated responses.
+* Incomplete backup strategy.
+* No security Event correlation.
+
+**Recommendations:**
+
+1. Develop incident response playbooks.
+2. Implement automated responses.
+3. Enhance backup strategy.
+4. Implement security event correlation using Security Hub.
+
+---
+
+### Risk Assessment Matrix
+
+**High Risk Items:**
+
+1. WAF need to be optimised.
+2. Lack of landing zone.
+3. Lack of threat detection strategy.
+4. Missing vulnerability scanning tool.
+
+**Medium Risk Items:**
+
+1. Network monitoring gaps.
+2. Missing security services.
+3. Incident response documentation.
+
+**Low Risk Items:**
+
+1. Password policies.
+2. SSE-KMS encryption configuration.
+3. Basic monitoring.
+
+---
+
+### Implementation Roadmap
+
+**Phase 1 (0-7 days):**
+
+1. Disable IAM identity centre in Virginia and create in Mumbai.
+2. Configure AD IDP in IAM identity center.
+3. Implement control tower landing zone.
+4. Implement threat detection service (GuardDuty) and WAF rules.
+5. Implement comprehensive logging.
+
+**Phase 2 (7-21 days):**
+
+1. Optimize CSPM solution (Security Hub) for security posture analysis at org level.
+2. Implement VPC flow logs.
+3. Enforce security controls using automation.
+
+**Phase 3 (21-30 days):**
+
+1. Establish central security team to manage all tenant workloads under umbrella of control tower.
