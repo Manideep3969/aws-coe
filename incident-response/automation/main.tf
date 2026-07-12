@@ -35,6 +35,33 @@ resource "aws_sns_topic_subscription" "security_team_sms" {
   endpoint  = "+91XXXXXXXXXX"
 }
 
+resource "aws_sns_topic_policy" "security_incidents" {
+  arn    = aws_sns_topic.security_incidents.arn
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowEventBridgePublish"
+        Effect = "Allow"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+        Action = "sns:Publish"
+        Resource = aws_sns_topic.security_incidents.arn
+      },
+      {
+        Sid    = "AllowGuardDutyPublish"
+        Effect = "Allow"
+        Principal = {
+          Service = "guardduty.amazonaws.com"
+        }
+        Action = "sns:Publish"
+        Resource = aws_sns_topic.security_incidents.arn
+      }
+    ]
+  })
+}
+
 resource "aws_cloudwatch_event_rule" "guardduty_finding" {
   name        = "npci-guardduty-finding-rule"
   description = "Route GuardDuty findings to automated remediation"
@@ -184,13 +211,21 @@ resource "aws_iam_role_policy_attachment" "auto_remediation" {
   policy_arn  = aws_iam_policy.auto_remediation.arn
 }
 
+data "archive_file" "isolate_ec2_zip" {
+  type        = "zip"
+  source_file = "${path.module}/src/isolate_ec2.py"
+  output_path = "${path.module}/isolate_ec2.zip"
+}
+
 resource "aws_lambda_function" "isolate_ec2" {
-  filename      = "isolate_ec2.zip"
-  function_name  = "npci-isolate-compromised-ec2"
+  filename      = data.archive_file.isolate_ec2_zip.output_path
+  function_name = "npci-isolate-compromised-ec2"
   role          = aws_iam_role.auto_remediation.arn
-  handler       = "index.handler"
+  handler       = "isolate_ec2.lambda_handler"
   runtime       = "python3.12"
   timeout       = 60
+
+  source_code_hash = data.archive_file.isolate_ec2_zip.output_base64sha256
 
   environment {
     variables = {
@@ -216,13 +251,21 @@ variable "vpc_id" {
   type = string
 }
 
+data "archive_file" "disable_iam_key_zip" {
+  type        = "zip"
+  source_file = "${path.module}/src/disable_iam_key.py"
+  output_path = "${path.module}/disable_iam_key.zip"
+}
+
 resource "aws_lambda_function" "disable_iam_key" {
-  filename      = "disable_iam_key.zip"
-  function_name  = "npci-disable-compromised-iam-key"
+  filename      = data.archive_file.disable_iam_key_zip.output_path
+  function_name = "npci-disable-compromised-iam-key"
   role          = aws_iam_role.auto_remediation.arn
-  handler       = "index.handler"
+  handler       = "disable_iam_key.lambda_handler"
   runtime       = "python3.12"
   timeout       = 30
+
+  source_code_hash = data.archive_file.disable_iam_key_zip.output_base64sha256
 
   environment {
     variables = {
@@ -277,6 +320,36 @@ resource "aws_cloudwatch_event_target" "isolate_ec2_lambda" {
   rule      = aws_cloudwatch_event_rule.guardduty_ec2_compromise.name
   target_id = "IsolateEC2"
   arn       = aws_lambda_function.isolate_ec2.arn
+}
+
+resource "aws_cloudwatch_log_group" "isolate_ec2" {
+  name              = "/aws/lambda/npci-isolate-compromised-ec2"
+  retention_in_days = 90
+
+  tags = var.tags
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_isolate" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.isolate_ec2.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.guardduty_ec2_compromise.arn
+}
+
+resource "aws_cloudwatch_log_group" "disable_iam_key" {
+  name              = "/aws/lambda/npci-disable-compromised-iam-key"
+  retention_in_days = 90
+
+  tags = var.tags
+}
+
+resource "aws_lambda_permission" "allow_eventbridge_disable_key" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.disable_iam_key.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.guardduty_iam_compromise.arn
 }
 
 output "security_incidents_topic_arn" {
