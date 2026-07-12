@@ -1,0 +1,74 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyRootUserActions",
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreateAccessKey",
+        "iam:CreateLoginProfile",
+        "iam:CreateUser",
+        "iam:DeleteAccessKey",
+        "iam:DeleteLoginProfile",
+        "iam:DeleteUser",
+        "iam:UpdateAccessKey",
+        "iam:UpdateLoginProfile",
+        "iam:PutUserPolicy",
+        "iam:AttachUserPolicy",
+        "iam:DetachUserPolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:user/root",
+        "arn:aws:iam::*:user/admin"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:PrincipalType": "Root"
+        }
+      }
+    },
+    {
+      "Sid": "DenyRootAccountAPIcalls",
+      "Effect": "Deny",
+      "NotAction": [
+        "iam:CreateVirtualMFADevice",
+        "iam:EnableMFADevice",
+        "iam:GetUser",
+        "iam:GetServiceLastAccessedDetails",
+        "iam:ListMFADevices",
+        "iam:ListVirtualMFADevices",
+        "iam:ResyncMFADevice",
+        "iam:DeleteVirtualMFADevice",
+        "sts:GetSessionToken",
+        "sts:GetCallerIdentity",
+        "account:*",
+        "billing:*",
+        "cur:*",
+        "aws-portal:*"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:PrincipalType": "Root"
+        }
+      }
+    },
+    {
+      "Sid": "DenyRootAccessKeyCreation",
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreateAccessKey"
+      ],
+      "Resource": "arn:aws:iam::*:root"
+    },
+    {
+      "Sid": "DenyRootPasswordChanges",
+      "Effect": "Deny",
+      "Action": [
+        "iam:DeleteAccountPasswordPolicy",
+        "iam:UpdateAccountPasswordPolicy"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

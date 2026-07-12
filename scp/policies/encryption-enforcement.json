@@ -1,0 +1,98 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyUnencryptedS3",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption": ["AES256", "aws:kms"]
+        },
+        "Null": {
+          "s3:x-amz-server-side-encryption": "false"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnencryptedEBS",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:RunInstances",
+        "ec2:CreateVolume"
+      ],
+      "Resource": "arn:aws:ec2:*:*:volume/*",
+      "Condition": {
+        "Bool": {
+          "ec2:Encrypted": "false"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnencryptedRDS",
+      "Effect": "Deny",
+      "Action": [
+        "rds:CreateDBInstance",
+        "rds:CreateDBCluster",
+        "rds:RestoreDBInstanceFromS3",
+        "rds:RestoreDBInstanceToPointInTime",
+        "rds:RestoreDBClusterFromS3",
+        "rds:RestoreDBClusterToPointInTime"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "rds:StorageEncrypted": "false"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnencryptedSQS",
+      "Effect": "Deny",
+      "Action": [
+        "sqs:CreateQueue",
+        "sqs:SetQueueAttributes"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "sqs:ServerSideEncryptionEnabled": "false"
+        }
+      }
+    },
+    {
+      "Sid": "DenyUnencryptedSNSTopic",
+      "Effect": "Deny",
+      "Action": [
+        "sns:CreateTopic",
+        "sns:SetTopicAttributes"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "sns:TopicOwner": "*"
+        }
+      }
+    },
+    {
+      "Sid": "DenySSES3ForSensitiveData",
+      "Effect": "Deny",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*confidential*/*",
+        "arn:aws:s3:::*restricted*/*",
+        "arn:aws:s3:::*sensitive*/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "s3:x-amz-server-side-encryption": "AES256"
+        }
+      }
+    }
+  ]
+}
