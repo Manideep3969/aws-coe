@@ -13,3 +13,9 @@ override.tf.json
 .terraform.tfstate.lock.info
 .SSMTerraform/
 *.zip
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.pytest.ini

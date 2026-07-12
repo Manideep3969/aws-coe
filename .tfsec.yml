@@ -1,0 +1,20 @@
+---
+# tfsec configuration
+# Severity thresholds: CRITICAL > HIGH > MEDIUM > LOW > INFO
+
+exclude:
+  # Exclude test directories
+  - "tests/**"
+
+# Soft failures for initial rollout - will be hardened later
+soft_fail: false
+
+# Custom checks configuration
+custom_checks: []
+
+# Skip specific checks that are not applicable
+skip_checks:
+  # Skip S3 bucket versioning check (handled by module)
+  - CKV_AWS_18
+  # Skip S3 access logging check (handled by dedicated module)
+  - CKV_AWS_19
