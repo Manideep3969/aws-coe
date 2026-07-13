@@ -36,7 +36,7 @@ resource "aws_sns_topic_subscription" "security_team_sms" {
 }
 
 resource "aws_sns_topic_policy" "security_incidents" {
-  arn    = aws_sns_topic.security_incidents.arn
+  arn = aws_sns_topic.security_incidents.arn
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -46,7 +46,7 @@ resource "aws_sns_topic_policy" "security_incidents" {
         Principal = {
           Service = "events.amazonaws.com"
         }
-        Action = "sns:Publish"
+        Action   = "sns:Publish"
         Resource = aws_sns_topic.security_incidents.arn
       },
       {
@@ -55,7 +55,7 @@ resource "aws_sns_topic_policy" "security_incidents" {
         Principal = {
           Service = "guardduty.amazonaws.com"
         }
-        Action = "sns:Publish"
+        Action   = "sns:Publish"
         Resource = aws_sns_topic.security_incidents.arn
       }
     ]
@@ -208,7 +208,7 @@ resource "aws_iam_policy" "auto_remediation" {
 
 resource "aws_iam_role_policy_attachment" "auto_remediation" {
   role       = aws_iam_role.auto_remediation.name
-  policy_arn  = aws_iam_policy.auto_remediation.arn
+  policy_arn = aws_iam_policy.auto_remediation.arn
 }
 
 data "archive_file" "isolate_ec2_zip" {

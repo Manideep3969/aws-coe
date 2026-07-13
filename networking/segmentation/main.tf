@@ -23,10 +23,10 @@ resource "aws_security_group" "web_tier" {
   }
 
   egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    security_groups = [aws_security_group.app_tier.id]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(var.tags, {
@@ -41,17 +41,10 @@ resource "aws_security_group" "app_tier" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port     = 443
-    to_port       = 443
-    protocol      = "tcp"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
     security_groups = [aws_security_group.web_tier.id]
-  }
-
-  egress {
-    from_port     = 3306
-    to_port       = 3306
-    protocol      = "tcp"
-    security_groups = [aws_security_group.db_tier.id]
   }
 
   egress {
@@ -67,15 +60,24 @@ resource "aws_security_group" "app_tier" {
   })
 }
 
+resource "aws_security_group_rule" "app_to_db" {
+  type                     = "egress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.app_tier.id
+  source_security_group_id = aws_security_group.db_tier.id
+}
+
 resource "aws_security_group" "db_tier" {
   name        = "npci-db-tier"
   description = "Security group for database tier - allows traffic from app tier only"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port     = 3306
-    to_port       = 3306
-    protocol      = "tcp"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
     security_groups = [aws_security_group.app_tier.id]
   }
 
@@ -98,8 +100,8 @@ resource "aws_network_acl_rule" "web_to_app" {
   rule_action    = "allow"
   from_port      = 443
   to_port        = 443
-  protocol      = "6"
-  cidr_block    = var.app_subnet_cidr
+  protocol       = "6"
+  cidr_block     = var.app_subnet_cidr
 }
 
 variable "web_subnet_nacl_id" {

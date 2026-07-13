@@ -32,7 +32,7 @@ resource "aws_organizations_policy" "root_protection" {
 resource "aws_organizations_policy" "region_lock" {
   name        = "npci-region-lock"
   description = "Limits AWS actions to approved regions only"
-  content     = file("${path.module}/policies/region-lock.json")
+  content     = templatefile("${path.module}/policies/region-lock.json.tpl", { approved_regions = var.approved_regions })
   type        = "SERVICE_CONTROL_POLICY"
 
   tags = merge(var.tags, {
@@ -116,11 +116,11 @@ resource "aws_organizations_policy_attachment" "network_protection" {
 
 output "policy_arns" {
   value = {
-    root_protection          = aws_organizations_policy.root_protection.arn
-    region_lock              = aws_organizations_policy.region_lock.arn
+    root_protection             = aws_organizations_policy.root_protection.arn
+    region_lock                 = aws_organizations_policy.region_lock.arn
     security_service_protection = aws_organizations_policy.security_service_protection.arn
-    encryption_enforcement   = aws_organizations_policy.encryption_enforcement.arn
-    public_access_prevention = aws_organizations_policy.public_access_prevention.arn
-    network_protection       = aws_organizations_policy.network_protection.arn
+    encryption_enforcement      = aws_organizations_policy.encryption_enforcement.arn
+    public_access_prevention    = aws_organizations_policy.public_access_prevention.arn
+    network_protection          = aws_organizations_policy.network_protection.arn
   }
 }

@@ -36,6 +36,31 @@ variable "approved_regions" {
   default     = ["ap-south-1"]
 }
 
+variable "vpc_id" {
+  description = "VPC ID for the security VPC"
+  type        = string
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "firewall_subnet_id" {
+  description = "Subnet ID for the network firewall"
+  type        = string
+}
+
+variable "web_subnet_nacl_id" {
+  description = "Network ACL ID for the web subnet"
+  type        = string
+}
+
+variable "app_subnet_cidr" {
+  description = "CIDR block for the application subnet"
+  type        = string
+}
+
 variable "tags" {
   description = "Common tags applied to all resources"
   type        = map(string)

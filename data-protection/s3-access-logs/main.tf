@@ -25,7 +25,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "s3_access_logs" {
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "aws:kms"
+      sse_algorithm     = "aws:kms"
       kms_master_key_id = var.kms_key_id
     }
     bucket_key_enabled = true
@@ -36,7 +36,7 @@ resource "aws_s3_bucket_public_access_block" "s3_access_logs" {
   bucket = aws_s3_bucket.s3_access_logs.id
 
   block_public_acls       = true
-  block_public_policy      = true
+  block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }

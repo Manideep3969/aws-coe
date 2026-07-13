@@ -38,7 +38,7 @@ resource "aws_s3_bucket_public_access_block" "vpc_flow_logs" {
   bucket = aws_s3_bucket.vpc_flow_logs.id
 
   block_public_acls       = true
-  block_public_policy      = true
+  block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
@@ -64,9 +64,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "vpc_flow_logs" {
 resource "aws_flow_log" "vpc_flow_logs" {
   for_each = toset(data.aws_vpcs.all.ids)
 
-  vpc_id          = each.value
-  traffic_type    = "ALL"
-  log_destination = aws_s3_bucket.vpc_flow_logs.arn
+  vpc_id               = each.value
+  traffic_type         = "ALL"
+  log_destination      = aws_s3_bucket.vpc_flow_logs.arn
   log_destination_type = "s3"
 
   tags = merge(var.tags, {

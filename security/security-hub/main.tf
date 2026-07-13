@@ -24,48 +24,43 @@ resource "aws_securityhub_standards_subscription" "nist" {
 }
 
 resource "aws_securityhub_organization_configuration" "npci" {
-  auto_enable_accounts = true
-  auto_enable_standards = "DEFAULT"
+  auto_enable = true
 }
 
 resource "aws_securityhub_insight" "critical_findings" {
   name = "NPCI Critical Security Findings"
 
   filters {
-    severity_label = [{
+    severity_label {
       comparison = "EQUALS"
       value      = "CRITICAL"
-    }]
+    }
 
-    workflow_status = [{
+    workflow_status {
       comparison = "EQUALS"
       value      = "NEW"
-    }]
+    }
   }
 
   group_by_attribute = "ResourceId"
-
-  tags = var.tags
 }
 
 resource "aws_securityhub_insight" "compliance_failures" {
   name = "NPCI Compliance Failures"
 
   filters {
-    type = [{
+    type {
       comparison = "EQUALS"
       value      = "Software and Configuration Checks"
-    }]
+    }
 
-    compliance_status = [{
+    compliance_status {
       comparison = "EQUALS"
       value      = "FAILED"
-    }]
+    }
   }
 
   group_by_attribute = "ComplianceControlId"
-
-  tags = var.tags
 }
 
 output "security_hub_arn" {

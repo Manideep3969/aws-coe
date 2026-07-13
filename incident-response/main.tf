@@ -1,11 +1,27 @@
+variable "aws_region" {
+  type = string
+}
+
+variable "management_account_id" {
+  type = string
+}
+
+variable "audit_account_id" {
+  type = string
+}
+
+variable "tags" {
+  type = map(string)
+}
+
 module "automation" {
   source = "./automation"
 
-  aws_region           = var.aws_region
+  aws_region            = var.aws_region
   management_account_id = var.management_account_id
-  audit_account_id     = var.audit_account_id
-  vpc_id               = var.vpc_id
-  tags                 = var.tags
+  audit_account_id      = var.audit_account_id
+  vpc_id                = var.vpc_id
+  tags                  = var.tags
 }
 
 variable "vpc_id" {

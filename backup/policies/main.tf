@@ -112,9 +112,9 @@ resource "aws_backup_selection" "dynamodb" {
 }
 
 resource "aws_backup_vault_lock_configuration" "npci" {
-  backup_vault_name = aws_backup_vault.npci.name
-  min_retention_days = 7
-  max_retention_days = 365
+  backup_vault_name   = aws_backup_vault.npci.name
+  min_retention_days  = 7
+  max_retention_days  = 365
   changeable_for_days = 30
 }
 

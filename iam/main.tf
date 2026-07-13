@@ -21,12 +21,12 @@ variable "tags" {
 resource "aws_iam_account_password_policy" "strict" {
   allow_users_to_change_password = true
   minimum_password_length        = 16
-  require_lowercase_characters  = true
-  require_uppercase_characters  = true
-  require_numbers               = true
-  require_symbols               = true
-  password_reuse_prevention     = 24
-  max_password_age              = 90
+  require_lowercase_characters   = true
+  require_uppercase_characters   = true
+  require_numbers                = true
+  require_symbols                = true
+  password_reuse_prevention      = 24
+  max_password_age               = 90
 }
 
 data "aws_iam_users" "all" {}
@@ -35,7 +35,7 @@ resource "aws_iam_user_policy_attachment" "force_mfa" {
   for_each = toset(data.aws_iam_users.all.arns)
 
   user       = split("/", each.value)[length(split("/", each.value)) - 1]
-  policy_arn  = aws_iam_policy.force_mfa.arn
+  policy_arn = aws_iam_policy.force_mfa.arn
 }
 
 resource "aws_iam_policy" "force_mfa" {
@@ -56,7 +56,7 @@ resource "aws_iam_policy" "force_mfa" {
           "iam:ListMFADevices",
           "iam:ListVirtualMFADevices"
         ]
-        Resource = "arn:aws:iam::*:mfa/${aws:username}"
+        Resource = "arn:aws:iam::*:mfa/$${aws:username}"
       },
       {
         Sid    = "AllowManageOwnAccessKeys"
@@ -67,7 +67,7 @@ resource "aws_iam_policy" "force_mfa" {
           "iam:ListAccessKeys",
           "iam:UpdateAccessKey"
         ]
-        Resource = "arn:aws:iam::*:user/${aws:username}"
+        Resource = "arn:aws:iam::*:user/$${aws:username}"
         Condition = {
           Bool = {
             "aws:MultiFactorAuthPresent" = "true"
@@ -136,7 +136,7 @@ resource "aws_accessanalyzer_analyzer" "organization" {
 
 resource "aws_accessanalyzer_analyzer" "account" {
   analyzer_name = "npci-account-access-analyzer"
-  type          = "ACCOUNT_UNUSED"
+  type          = "ACCOUNT_UNUSED_ACCESS"
 
   tags = merge(var.tags, {
     Name = "npci-account-access-analyzer"
@@ -151,15 +151,15 @@ resource "aws_iam_policy" "access_analyzer_integration" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "AccessAnalyzerIntegration"
-        Effect    = "Allow"
-        Action    = [
+        Sid    = "AccessAnalyzerIntegration"
+        Effect = "Allow"
+        Action = [
           "access-analyzer:GetAnalyzer",
           "access-analyzer:GetFinding",
           "access-analyzer:ListFindings",
           "access-analyzer:ListAnalyzers"
         ]
-        Resource  = "*"
+        Resource = "*"
       }
     ]
   })

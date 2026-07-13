@@ -36,9 +36,9 @@ resource "aws_networkfirewall_firewall_policy" "npci" {
 }
 
 resource "aws_networkfirewall_rule_group" "suricata_pass" {
-  capacity    = 100
-  name        = "npci-suricata-pass"
-  type        = "STATELESS"
+  capacity = 100
+  name     = "npci-suricata-pass"
+  type     = "STATELESS"
 
   rule_group {
     rules_source {
@@ -71,9 +71,9 @@ resource "aws_networkfirewall_rule_group" "suricata_pass" {
 }
 
 resource "aws_networkfirewall_rule_group" "deny_known_bad" {
-  capacity    = 100
-  name        = "npci-deny-known-bad"
-  type        = "STATELESS"
+  capacity = 100
+  name     = "npci-deny-known-bad"
+  type     = "STATELESS"
 
   rule_group {
     rules_source {
@@ -175,5 +175,5 @@ output "firewall_arn" {
 }
 
 output "firewall_endpoint" {
-  value = aws_networkfirewall_firewall.npci.firewall_status[0].sync_states[0].attachment[0].endpoint_id
+  value = aws_networkfirewall_firewall.npci.firewall_status[0].sync_states[*].attachment[*].endpoint_id
 }

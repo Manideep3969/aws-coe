@@ -35,7 +35,7 @@ resource "aws_s3_bucket_public_access_block" "data_classification_inventory" {
   bucket = aws_s3_bucket.data_classification_inventory.id
 
   block_public_acls       = true
-  block_public_policy      = true
+  block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
@@ -60,10 +60,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_classification_inventory"
 
 locals {
   data_classification_tags = {
-    "DataClassification:Public"      = "Data that can be shared publicly"
-    "DataClassification:Internal"    = "Data for internal use only"
+    "DataClassification:Public"       = "Data that can be shared publicly"
+    "DataClassification:Internal"     = "Data for internal use only"
     "DataClassification:Confidential" = "Data requiring strict access controls"
-    "DataClassification:Restricted"  = "Highly sensitive data with regulatory requirements"
+    "DataClassification:Restricted"   = "Highly sensitive data with regulatory requirements"
   }
 
   tag_policy = jsonencode({
@@ -97,24 +97,14 @@ resource "aws_config_config_rule" "data_classification_tag" {
   name = "npci-data-classification-tag-rule"
 
   source {
-    owner             = "CUSTOM_LIN"
-    source_identifier = "DATA_CLASSIFICATION_TAG_CHECK"
-    source_detail {
-      key   = "Inline"
-      value = <<-EOT
-        # Check that all resources have DataClassification tag
-        import json
-        def evaluate_compliance(configuration_item):
-            tags = configuration_item.get('tags', {})
-            if 'DataClassification' not in tags:
-                return 'NON_COMPLIANT'
-            valid_values = ['Public', 'Internal', 'Confidential', 'Restricted']
-            if tags['DataClassification'] not in valid_values:
-                return 'NON_COMPLIANT'
-            return 'COMPLIANT'
-      EOT
-    }
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
   }
+
+  input_parameters = jsonencode({
+    Tag1Key        = "DataClassification"
+    Tag1Compliance = "NON_COMPLIANT"
+  })
 
   scope {
     compliance_resource_types = [

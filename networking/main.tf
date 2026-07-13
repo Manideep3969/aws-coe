@@ -1,3 +1,11 @@
+variable "aws_region" {
+  type = string
+}
+
+variable "tags" {
+  type = map(string)
+}
+
 module "vpc_flow_logs" {
   source = "./vpc-flow-logs"
 
@@ -8,21 +16,21 @@ module "vpc_flow_logs" {
 module "network_firewall" {
   source = "./network-firewall"
 
-  aws_region       = var.aws_region
-  vpc_id           = var.vpc_id
-  vpc_cidr         = var.vpc_cidr
+  aws_region         = var.aws_region
+  vpc_id             = var.vpc_id
+  vpc_cidr           = var.vpc_cidr
   firewall_subnet_id = var.firewall_subnet_id
-  tags             = var.tags
+  tags               = var.tags
 }
 
 module "segmentation" {
   source = "./segmentation"
 
-  aws_region        = var.aws_region
-  vpc_id            = var.vpc_id
+  aws_region         = var.aws_region
+  vpc_id             = var.vpc_id
   web_subnet_nacl_id = var.web_subnet_nacl_id
-  app_subnet_cidr   = var.app_subnet_cidr
-  tags              = var.tags
+  app_subnet_cidr    = var.app_subnet_cidr
+  tags               = var.tags
 }
 
 variable "vpc_id" {

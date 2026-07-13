@@ -85,7 +85,7 @@ resource "aws_kms_key" "confidential" {
   })
 
   tags = merge(var.tags, {
-    Name              = "npci-confidential-kms"
+    Name               = "npci-confidential-kms"
     DataClassification = "confidential"
   })
 }
@@ -146,7 +146,7 @@ resource "aws_kms_key" "restricted" {
   })
 
   tags = merge(var.tags, {
-    Name              = "npci-restricted-kms"
+    Name               = "npci-restricted-kms"
     DataClassification = "restricted"
   })
 }
@@ -162,7 +162,7 @@ resource "aws_kms_key" "internal" {
   enable_key_rotation     = true
 
   tags = merge(var.tags, {
-    Name              = "npci-internal-kms"
+    Name               = "npci-internal-kms"
     DataClassification = "internal"
   })
 }
@@ -178,6 +178,6 @@ output "kms_key_arns" {
   value = {
     confidential = aws_kms_key.confidential.arn
     restricted   = aws_kms_key.restricted.arn
-    internal    = aws_kms_key.internal.arn
+    internal     = aws_kms_key.internal.arn
   }
 }

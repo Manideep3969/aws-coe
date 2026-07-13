@@ -23,26 +23,25 @@ variable "tags" {
 }
 
 resource "aws_controltower_landing_zone" "npci" {
-  name = "npci-landing-zone"
+  version = "2023-11-27"
 
   manifest_json = jsonencode({
-    schemaVersion = "2023-11-27"
     governanceRegions = [var.aws_region]
     managedOrganizationalUnits = [
       {
-        name = "Security"
+        name                   = "Security"
         organizationalUnitName = "Security"
       },
       {
-        name = "Sandbox"
+        name                   = "Sandbox"
         organizationalUnitName = "Sandbox"
       },
       {
-        name = "Production"
+        name                   = "Production"
         organizationalUnitName = "Production"
       },
       {
-        name = "NonProduction"
+        name                   = "NonProduction"
         organizationalUnitName = "NonProduction"
       }
     ]
@@ -92,7 +91,7 @@ resource "aws_s3_bucket_public_access_block" "control_tower_logs" {
   bucket = aws_s3_bucket.control_tower_logs.id
 
   block_public_acls       = true
-  block_public_policy      = true
+  block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }

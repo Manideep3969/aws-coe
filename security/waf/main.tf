@@ -28,14 +28,24 @@ resource "aws_wafv2_regex_pattern_set" "sql_injection" {
   name  = "npci-sql-injection-patterns"
   scope = "REGIONAL"
 
-  regular_expression_list = [
-    "(?i)(?:union.*select)",
-    "(?i)(?:insert.*into)",
-    "(?i)(?:delete.*from)",
-    "(?i)(?:drop.*table)",
-    "(?i)(?:exec\\()",
-    "(?i)(?:xp_cmdshell)"
-  ]
+  regular_expression {
+    regex_string = "(?i)(?:union.*select)"
+  }
+  regular_expression {
+    regex_string = "(?i)(?:insert.*into)"
+  }
+  regular_expression {
+    regex_string = "(?i)(?:delete.*from)"
+  }
+  regular_expression {
+    regex_string = "(?i)(?:drop.*table)"
+  }
+  regular_expression {
+    regex_string = "(?i)(?:exec\\()"
+  }
+  regular_expression {
+    regex_string = "(?i)(?:xp_cmdshell)"
+  }
 
   tags = var.tags
 }
@@ -66,7 +76,7 @@ resource "aws_wafv2_web_acl" "npci_waf" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name               = "commonruleset"
+      metric_name                = "commonruleset"
       sampled_requests_enabled   = true
     }
   }
@@ -88,7 +98,7 @@ resource "aws_wafv2_web_acl" "npci_waf" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name               = "anonymousiplist"
+      metric_name                = "anonymousiplist"
       sampled_requests_enabled   = true
     }
   }
@@ -110,7 +120,7 @@ resource "aws_wafv2_web_acl" "npci_waf" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name               = "ipreputationlist"
+      metric_name                = "ipreputationlist"
       sampled_requests_enabled   = true
     }
   }
@@ -132,7 +142,7 @@ resource "aws_wafv2_web_acl" "npci_waf" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name               = "knownbadinputs"
+      metric_name                = "knownbadinputs"
       sampled_requests_enabled   = true
     }
   }
@@ -154,7 +164,7 @@ resource "aws_wafv2_web_acl" "npci_waf" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name               = "sqliruleset"
+      metric_name                = "sqliruleset"
       sampled_requests_enabled   = true
     }
   }
@@ -176,7 +186,7 @@ resource "aws_wafv2_web_acl" "npci_waf" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name               = "ratelimit"
+      metric_name                = "ratelimit"
       sampled_requests_enabled   = true
     }
   }
@@ -197,14 +207,14 @@ resource "aws_wafv2_web_acl" "npci_waf" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name               = "blockedips"
+      metric_name                = "blockedips"
       sampled_requests_enabled   = true
     }
   }
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name               = "npci-waf"
+    metric_name                = "npci-waf"
     sampled_requests_enabled   = true
   }
 
