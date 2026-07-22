@@ -1,0 +1,88 @@
+# ============================================================================
+# AWS CoE - Terraform Variables Configuration
+# ============================================================================
+# Copy this file to terraform.tfvars and fill in your account-specific values:
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# NEVER commit terraform.tfvars to version control - it contains account-specific
+# and potentially sensitive values. The .gitignore already excludes *.tfvars.
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Required Variables (no defaults - must be provided)
+# ---------------------------------------------------------------------------
+
+# AWS Organizations ID (e.g., o-abc123def456)
+# Find it with: aws organizations describe-organization --query "Organization.Id" --output text
+org_id = "o-YOUR_ORG_ID"
+
+# AWS Account ID for the management/root account (e.g., 123456789012)
+# Find it with: aws sts get-caller-identity --query "Account" --output text
+management_account_id = "123456789012"
+
+# AWS Account ID for the Control Tower audit account
+# Created by Control Tower or specify your existing audit account
+audit_account_id = "123456789012"
+
+# AWS Account ID for the Control Tower log archive account
+# Created by Control Tower or specify your existing log archive account
+log_archive_account_id = "123456789012"
+
+# VPC ID where network firewall and security groups will be deployed
+# Find it with: aws ec2 describe-vpcs --query "Vpcs[0].VpcId" --output text
+vpc_id = "vpc-0123456789abcdef0"
+
+# CIDR block of the VPC (e.g., 10.0.0.0/16)
+vpc_cidr = "10.0.0.0/16"
+
+# Subnet ID for the Network Firewall (dedicated firewall subnet)
+# Find it with: aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-xxx" --query "Subnets[0].SubnetId" --output text
+firewall_subnet_id = "subnet-0123456789abcdef0"
+
+# NACL ID for the web subnet (for network segmentation rules)
+# Find it with: aws ec2 describe-network-acls --filters "Name=vpc-id,Values=vpc-xxx" --query "NetworkAcls[0].NetworkAclId" --output text
+web_subnet_nacl_id = "acl-0123456789abcdef0"
+
+# CIDR block for the application subnet (for NACL rules)
+app_subnet_cidr = "10.0.2.0/24"
+
+# ---------------------------------------------------------------------------
+# Optional Variables (have defaults - override if needed)
+# ---------------------------------------------------------------------------
+
+# Primary AWS region (default: ap-south-1 / Mumbai)
+# Change only if deploying to a different region
+aws_region = "ap-south-1"
+
+# Primary domain for IAM Identity Center
+primary_domain = "npci.org.in"
+
+# Approved AWS regions for SCP region lock
+# Add more regions if your workloads span multiple regions
+approved_regions = ["ap-south-1"]
+
+# Common tags applied to all resources
+# Extend with your organization's tagging requirements
+tags = {
+  ManagedBy   = "aws-coe"
+  Project     = "npci-security-baseline"
+  Environment = "production"
+  CostCenter  = "security"
+  Owner       = "platform-team"
+}
+
+# ---------------------------------------------------------------------------
+# Backend Configuration (optional - for terraform init -backend-config)
+# ---------------------------------------------------------------------------
+# If you used the bootstrap script, the bucket name will be:
+#   npci-terraform-state-<YOUR_ACCOUNT_ID>
+#
+# You can pass backend config as a separate file:
+#   terraform init -backend-config=backend.hcl
+#
+# Create backend.hcl with:
+#   bucket       = "npci-terraform-state-123456789012"
+#   key          = "control-tower/terraform.tfstate"
+#   region       = "ap-south-1"
+#   use_lockfile = true
+#   encrypt      = true
