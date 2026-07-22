@@ -3,6 +3,8 @@
 *.tfstate.backup
 *.tfvars
 *.tfvars.json
+*.hcl
+!backend.hcl.example
 .terraform.lock.hcl
 *.tf.json
 crash.log
@@ -13,3 +15,9 @@ override.tf.json
 .terraform.tfstate.lock.info
 .SSMTerraform/
 *.zip
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
